@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"> 
+  
+<head>
+  <meta charset="UTF-8">
+  <title>Lyrics Search</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header>
+    <h1>Busca letras</h1>
+
+  <button id="rolar">Rolar</button>
+
+    <form id="form">
+
+      <input
+      autofocus
+     
+        id="search"
+        type="text"
+        placeholder="Insira o nome do artista ou da música..."
+      />
+
+      <button>Buscar</button>
+    </form>
+  </header>
+
+  <ul id="songs-container" class="songs-container songs"></ul>
+
+  <div id="prev-and-next-container" class="prev-and-next-container"></div>
+
+  <p id="fim"></p>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+
+  <script src="./app.js"></script>
+
+  <script>
+    function insertSongIntoPage(value){
+      let songContainer = document.querySelector('#songs-container')
+      let prevAndNext = document.querySelector('#prev-and-next-container')
+
+
+       
+        // o map ele trabalha com array,e recebe como parametro uma arrow function
+        // para cada item do array ele executa uma função, e retorna o mesmo array com as funções aplicadas.
+        songContainer.innerHTML = value.data.map(song => `
+        <li class='song' >
+        <span class='song-artist'><strong>${song.artist.name}</strong>-${song.title}</span> 
+        <button class = 'btn' data-artist=${song.artist.name} data-song-title=${song.title} >Ver letra</button>
+        </li>
+        `).join('');
+       
+      
+        //verifica se existe esses atributos no json da api
+        if(value.prev || value.next){
+            prevAndNext.innerHTML = `
+            ${value.prev ? `<button class = "btn" onClick="getMoreSongs('${value.prev}')"  >Anteriores</button>` : ''}
+            ${value.next ? `<button class = 'btn' onClick = "getMoreSongs('${value.next}')" >Proxímas</button>` : ''}
+            `  
+            
+           
+            return
+        }
+
+        this.prevAndNext.innerHTML = ''
+    }
+  </script>
+
+  <script>
+    function getMoreSongs(url){
+
+let response =  fetch(`https://cors-anywhere.herokuapp.com/${url}`)
+.then(response=> response.json())
+.then(data =>{
+    insertSongIntoPage(data)
+    
+    
+})
+}
+  </script>
+  <script>
+let scrollPosition = 0;
+const velocity = 0.3;
+let animation; //Armazena o ID da animação. Isso servirá para quando quiser pausa-la.
+
+/* Botão para iniciar animação */
+document.querySelector("#rolar").addEventListener("click", () => {
+  rolarPagina("#fim")
+});
+
+/* Botão para pausar animação */
+// document.querySelector("#pause").addEventListener("click", () => {
+//   cancelAnimationFrame(animation)
+// });
+
+/* Função para rolar a página */
+function rolarPagina(element) {
+  window.scroll(0, scrollPosition += velocity);
+  
+  if (document.querySelector(element).offsetTop <= scrollPosition) {
+   cancelAnimationFrame(animation)
+   scrollPosition = 0
+    return;
+  }
+  
+  animation = requestAnimationFrame(() => {
+    rolarPagina(element);
+  })
+}
+  </script>
+
+
+</body>
+</html>
